@@ -1,0 +1,51 @@
+{% extends "layout.html" %}
+{% block title %}Cart{% endblock %}
+
+{% block content %}
+<h1 class="my-4">Your Cart</h1>
+
+{% if cart %}
+<table class="table align-middle">
+    <thead>
+        <tr>
+            <th>Image</th>
+            <th>Product</th>
+            <th>Price</th>
+            <th>Qty</th>
+            <th>Subtotal</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in cart.values() %}
+        <tr>
+            <td><img src="{{ item.image }}" style="width:60px;height:60px;object-fit:cover;"></td>
+            <td>{{ item.name }}</td>
+            <td>${{ item.price }}</td>
+            <td>{{ item.quantity }}</td>
+            <td>${{ (Decimal(item.price) * item.quantity)|round(2) }}</td>
+            <td>
+                <form method="post" action="{{ url_for('update_cart', pid=item.id) }}" class="d-inline">
+                    <input type="hidden" name="action" value="increase">
+                    <button class="btn btn-sm btn-success">+</button>
+                </form>
+                <form method="post" action="{{ url_for('update_cart', pid=item.id) }}" class="d-inline">
+                    <input type="hidden" name="action" value="decrease">
+                    <button class="btn btn-sm btn-warning">-</button>
+                </form>
+                <form method="post" action="{{ url_for('update_cart', pid=item.id) }}" class="d-inline">
+                    <input type="hidden" name="action" value="remove">
+                    <button class="btn btn-sm btn-danger">x</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<h3 class="text-end">Total: ${{ total|round(2) }}</h3>
+{% else %}
+<p class="lead">Your cart is empty.</p>
+{% endif %}
+
+<a href="{{ url_for('home') }}" class="btn btn-outline-primary">Continue Shopping</a>
+{% endblock %}

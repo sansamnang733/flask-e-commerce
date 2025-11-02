@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<h1 class="my-4">All Products</h1>
+<div class="row">
+    {% for p in products %}
+    <div class=" col-12 col-md-4 col-lg-3 mb-4">
+        <div class="card h-100">
+            <div class="p-3">
+                 <img src="{{ p.image }}" class="card-img-top rounded-4 " style="height:200px;object-fit:cover;">
+            </div>
+
+            <div class="card-body d-flex flex-column">
+                <h5 class="card-title">{{ p.name }}</h5>
+                <p class="card-text flex-grow-1">{{ p.desc }}</p>
+                <p class="card-text"><strong>${{ p.price }}</strong></p>
+                <a href="{{ url_for('add_to_cart', product_id=p.id) }}"
+                   class="btn btn-primary mt-auto">Add to Cart</a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
