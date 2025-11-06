@@ -5,6 +5,7 @@ from flask import (
 )
 from decimal import Decimal
 import os
+from telegram.telegrambot import sendMessage, token
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)          # random secret key
@@ -28,6 +29,7 @@ PRODUCTS = [
     {"id":13, "name": "Desk Lamp",             "price": Decimal("18.50"), "desc": "Adjustable LED desk lamp.",             "image": "https://images.pexels.com/photos/271639/pexels-photo-271639.jpeg"},
     {"id":14, "name": "Headphones",            "price": Decimal("49.99"), "desc": "Over-ear noise-cancelling headphones.", "image": "https://images.pexels.com/photos/159853/headphones-music-sound-159853.jpeg"},
     {"id":15, "name": "Coffee Mug",            "price": Decimal("9.99"),  "desc": "Ceramic coffee mug for hot drinks.",    "image": "https://images.pexels.com/photos/585750/pexels-photo-585750.jpeg"},
+    {"id":16, "name": "Coffee Mug",            "price": Decimal("9.99"),  "desc": "Ceramic coffee mug for hot drinks.",    "image": "https://images.pexels.com/photos/585750/pexels-photo-585750.jpeg"},
 ]
 
 def get_product(pid: int):
@@ -111,5 +113,44 @@ def remove_from_cart(pid):
 # ----------------------------------------------------------------------
 # RUN
 # ----------------------------------------------------------------------
+ # import token too
+
+@app.get('/contact')
+def contact():
+    return render_template('contact.html')
+
+@app.post('/contact/submit')
+def contact_submit():
+    form = request.form
+    name = form.get('name')
+    email = form.get('email')
+    subject = form.get('subject')
+    phone = form.get('phone')
+    message = form.get('message')
+
+    if not name or not email or not message:
+        flash('Please fill in all required fields.', 'error')
+        return redirect(url_for('contact'))
+
+    telegram_message = f"""
+    🔔 <b>New Contact Form Submission</b>
+
+    👤 <b>Name:</b> {name}
+    📧 <b>Email:</b> {email}
+    📞 <b>Phone:</b> {phone or 'Not provided'}
+    💡 <b>Subject:</b> {subject or 'Not provided'}
+    💬 <b>Message:</b>
+    {message}
+    """
+
+    result = sendMessage(token, telegram_message)
+
+    if '"ok":true' in result:
+        flash('Thank you! Your message has been sent successfully.', 'success')
+    else:
+        flash('Sorry, there was an error sending your message. Please try again.', 'error')
+
+    return redirect(url_for('contact'))
+
 if __name__ == "__main__":
     app.run(debug=True)
